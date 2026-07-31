@@ -23,7 +23,7 @@ Hostinger adds the connection variables and triggers a deployment automatically.
 
 ```env
 SUPABASE_URL=https://PROJECT_REF.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_SIDE_SERVICE_ROLE_KEY
+SUPABASE_API_KEY=THE_KEY_ADDED_BY_HOSTINGER
 JWT_SECRET=GENERATE_A_LONG_RANDOM_VALUE
 ```
 
@@ -37,9 +37,9 @@ You can generate a JWT secret locally with:
 openssl rand -hex 32
 ```
 
-The server recognizes `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_KEY`, and the common
-anon-key names. A service-role key is required with the secure RLS configuration
-in `database.sql`; never expose that key through a `VITE_` variable or browser code.
+The server recognizes Hostinger's `SUPABASE_API_KEY` as well as service-role and
+common Supabase key names. Keep this variable server-side; never expose it through
+a `VITE_` variable or browser code.
 
 ## 4. Verify
 

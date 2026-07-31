@@ -103,7 +103,7 @@ cd projectmanager
 1. Configure the server environment:
    ```env
    SUPABASE_URL=https://PROJECT_REF.supabase.co
-   SUPABASE_SERVICE_ROLE_KEY=replace-with-server-side-key
+   SUPABASE_API_KEY=automatically-added-by-hostinger
    JWT_SECRET=replace-with-a-long-random-secret
    ```
 
