@@ -1,4 +1,12 @@
 <?php
+if (!defined('JWT_SECRET')) {
+    $jwtSecret = getenv('JWT_SECRET') ?: '';
+    if ($jwtSecret === '') {
+        throw new RuntimeException('JWT_SECRET environment variable is required');
+    }
+    define('JWT_SECRET', $jwtSecret);
+}
+
 function base64url_encode(string $data): string {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 }

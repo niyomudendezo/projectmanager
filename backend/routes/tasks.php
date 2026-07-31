@@ -10,13 +10,13 @@ function handleTasks(string $method, array $segments): void {
     $action = $segments[2] ?? null;
 
     function verifyTaskOwner(PDO $db, int $taskId, int $userId): bool {
-        $stmt = $db->prepare('SELECT t.id FROM tasks t JOIN columns_table c ON t.column_id = c.id JOIN projects p ON c.project_id = p.id WHERE t.id = ? AND (p.user_id = ? OR EXISTS (SELECT 1 FROM project_collaborators pc WHERE pc.project_id = p.id AND pc.user_id = ? AND pc.status = "accepted"))');
+        $stmt = $db->prepare("SELECT t.id FROM tasks t JOIN columns_table c ON t.column_id = c.id JOIN projects p ON c.project_id = p.id WHERE t.id = ? AND (p.user_id = ? OR EXISTS (SELECT 1 FROM project_collaborators pc WHERE pc.project_id = p.id AND pc.user_id = ? AND pc.status = 'accepted'))");
         $stmt->execute([$taskId, $userId, $userId]);
         return (bool)$stmt->fetch();
     }
 
     function verifyColumnOwner(PDO $db, int $columnId, int $userId): bool {
-        $stmt = $db->prepare('SELECT c.id FROM columns_table c JOIN projects p ON c.project_id = p.id WHERE c.id = ? AND (p.user_id = ? OR EXISTS (SELECT 1 FROM project_collaborators pc WHERE pc.project_id = p.id AND pc.user_id = ? AND pc.status = "accepted"))');
+        $stmt = $db->prepare("SELECT c.id FROM columns_table c JOIN projects p ON c.project_id = p.id WHERE c.id = ? AND (p.user_id = ? OR EXISTS (SELECT 1 FROM project_collaborators pc WHERE pc.project_id = p.id AND pc.user_id = ? AND pc.status = 'accepted'))");
         $stmt->execute([$columnId, $userId, $userId]);
         return (bool)$stmt->fetch();
     }
@@ -52,9 +52,9 @@ function handleTasks(string $method, array $segments): void {
             http_response_code(400); echo json_encode(['error' => 'End date and time must be after the start']); return;
         }
 
-        $stmt = $db->prepare('INSERT INTO tasks (column_id, title, description, priority, start_date, end_date, start_time, end_time, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $stmt = $db->prepare('INSERT INTO tasks (column_id, title, description, priority, start_date, end_date, start_time, end_time, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id');
         $stmt->execute([$columnId, $title, $data['description'] ?? '', $data['priority'] ?? 'medium', $startDate, $endDate, $startTime, $endTime, $pos]);
-        $newId = (int)$db->lastInsertId();
+        $newId = (int)$stmt->fetchColumn();
 
         http_response_code(201);
         echo json_encode(['id' => $newId, 'column_id' => $columnId, 'title' => $title, 'description' => $data['description'] ?? '', 'priority' => $data['priority'] ?? 'medium', 'start_date' => $startDate, 'end_date' => $endDate, 'start_time' => $startTime, 'end_time' => $endTime, 'position' => $pos]);

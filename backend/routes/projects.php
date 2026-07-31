@@ -43,7 +43,7 @@ function handleProjects(string $method, array $segments): void {
     if ($method === 'GET' && !$projectId) {
         // Personal dashboard data is strictly owner-scoped. Shared projects are
         // intentionally listed through the invitations endpoint instead.
-        $stmt = $db->prepare('SELECT p.*, "owner" AS role FROM projects p WHERE p.user_id = ? ORDER BY p.created_at DESC');
+        $stmt = $db->prepare("SELECT p.*, 'owner' AS role FROM projects p WHERE p.user_id = ? ORDER BY p.created_at DESC");
         $stmt->execute([$userId]);
         $projects = $stmt->fetchAll();
 
@@ -65,7 +65,7 @@ function handleProjects(string $method, array $segments): void {
     }
 
     if ($method === 'GET' && $projectId) {
-        $stmt = $db->prepare('SELECT p.*, CASE WHEN p.user_id = ? THEN "owner" ELSE "collaborator" END AS role FROM projects p WHERE p.id = ? AND (p.user_id = ? OR EXISTS (SELECT 1 FROM project_collaborators pc WHERE pc.project_id = p.id AND pc.user_id = ? AND pc.status = "accepted"))');
+        $stmt = $db->prepare("SELECT p.*, CASE WHEN p.user_id = ? THEN 'owner' ELSE 'collaborator' END AS role FROM projects p WHERE p.id = ? AND (p.user_id = ? OR EXISTS (SELECT 1 FROM project_collaborators pc WHERE pc.project_id = p.id AND pc.user_id = ? AND pc.status = 'accepted'))");
         $stmt->execute([$userId, $projectId, $userId, $userId]);
         $project = $stmt->fetch();
         if (!$project) { http_response_code(404); echo json_encode(['error' => 'Not found']); return; }
@@ -90,9 +90,9 @@ function handleProjects(string $method, array $segments): void {
         $name = trim($data['name'] ?? '');
         if (!$name) { http_response_code(400); echo json_encode(['error' => 'Name required']); return; }
 
-        $stmt = $db->prepare('INSERT INTO projects (user_id, name, description) VALUES (?, ?, ?)');
+        $stmt = $db->prepare('INSERT INTO projects (user_id, name, description) VALUES (?, ?, ?) RETURNING id');
         $stmt->execute([$userId, $name, $data['description'] ?? '']);
-        $newId = (int)$db->lastInsertId();
+        $newId = (int)$stmt->fetchColumn();
 
         foreach ([['To Do', 0], ['In Progress', 1], ['Done', 2]] as [$colName, $pos]) {
             $stmt = $db->prepare('INSERT INTO columns_table (project_id, name, position) VALUES (?, ?, ?)');

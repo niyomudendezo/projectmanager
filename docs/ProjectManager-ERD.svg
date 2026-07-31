@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <defs>
+    <style>
+      .title{font:700 34px Arial;fill:#182b62}.sub{font:16px Arial;fill:#60708e}
+      .table{fill:#fff;stroke:#728be5;stroke-width:2}.head{fill:#4967df}
+      .tn{font:700 20px Arial;fill:#fff}.field{font:15px Arial;fill:#1f2a44}
+      .key{font:700 13px Arial;fill:#4967df}.type{font:13px Arial;fill:#71809c}
+      .rel{fill:none;stroke:#4967df;stroke-width:3}.card{font:700 17px Arial;fill:#344fb8}
+      .note{font:14px Arial;fill:#64718b}
+    </style>
+    <filter id="shadow"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-opacity=".14"/></filter>
+  </defs>
+  <rect width="1600" height="1050" fill="#f7f9ff"/>
+  <text x="70" y="65" class="title">ProjectManager — Entity Relationship Diagram</text>
+  <text x="70" y="94" class="sub">MySQL database schema · Primary keys, foreign keys, and cardinalities</text>
+
+  <!-- relationships, drawn below tables -->
+  <path class="rel" d="M410 250 H545"/>
+  <text x="425" y="240" class="card">1</text><text x="516" y="240" class="card">N</text>
+  <path class="rel" d="M925 250 H1060"/>
+  <text x="941" y="240" class="card">1</text><text x="1030" y="240" class="card">N</text>
+  <path class="rel" d="M1240 465 V590"/>
+  <text x="1215" y="490" class="card">1</text><text x="1215" y="583" class="card">N</text>
+  <path class="rel" d="M240 465 V805 H545"/>
+  <text x="215" y="490" class="card">1</text><text x="516" y="794" class="card">N</text>
+  <path class="rel" d="M735 480 V590"/>
+  <text x="710" y="505" class="card">1</text><text x="710" y="583" class="card">N</text>
+  <path class="rel" d="M410 360 H470 V885 H545"/>
+  <text x="425" y="350" class="card">1</text><text x="516" y="875" class="card">N</text>
+
+  <!-- users -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="135" width="340" height="330" rx="12" class="table"/>
+    <path d="M82 135 H398 A12 12 0 0 1 410 147 V190 H70 V147 A12 12 0 0 1 82 135" class="head"/>
+    <text x="92" y="171" class="tn">users</text>
+    <text x="92" y="222" class="key">PK</text><text x="133" y="222" class="field">id</text><text x="365" y="222" text-anchor="end" class="type">INT</text>
+    <text x="133" y="263" class="field">name</text><text x="365" y="263" text-anchor="end" class="type">VARCHAR(100)</text>
+    <text x="92" y="304" class="key">UQ</text><text x="133" y="304" class="field">email</text><text x="365" y="304" text-anchor="end" class="type">VARCHAR(150)</text>
+    <text x="133" y="345" class="field">password</text><text x="365" y="345" text-anchor="end" class="type">VARCHAR(255)</text>
+    <text x="133" y="386" class="field">created_at</text><text x="365" y="386" text-anchor="end" class="type">TIMESTAMP</text>
+  </g>
+
+  <!-- projects -->
+  <g filter="url(#shadow)">
+    <rect x="545" y="135" width="380" height="345" rx="12" class="table"/>
+    <path d="M557 135 H913 A12 12 0 0 1 925 147 V190 H545 V147 A12 12 0 0 1 557 135" class="head"/>
+    <text x="567" y="171" class="tn">projects</text>
+    <text x="567" y="222" class="key">PK</text><text x="608" y="222" class="field">id</text><text x="880" y="222" text-anchor="end" class="type">INT</text>
+    <text x="567" y="263" class="key">FK</text><text x="608" y="263" class="field">user_id</text><text x="880" y="263" text-anchor="end" class="type">INT → users.id</text>
+    <text x="608" y="304" class="field">name</text><text x="880" y="304" text-anchor="end" class="type">VARCHAR(150)</text>
+    <text x="608" y="345" class="field">description</text><text x="880" y="345" text-anchor="end" class="type">TEXT</text>
+    <text x="608" y="386" class="field">created_at</text><text x="880" y="386" text-anchor="end" class="type">TIMESTAMP</text>
+  </g>
+
+  <!-- columns -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="135" width="360" height="330" rx="12" class="table"/>
+    <path d="M1072 135 H1408 A12 12 0 0 1 1420 147 V190 H1060 V147 A12 12 0 0 1 1072 135" class="head"/>
+    <text x="1082" y="171" class="tn">columns_table</text>
+    <text x="1082" y="222" class="key">PK</text><text x="1123" y="222" class="field">id</text><text x="1375" y="222" text-anchor="end" class="type">INT</text>
+    <text x="1082" y="263" class="key">FK</text><text x="1123" y="263" class="field">project_id</text><text x="1375" y="263" text-anchor="end" class="type">INT → projects.id</text>
+    <text x="1123" y="304" class="field">name</text><text x="1375" y="304" text-anchor="end" class="type">VARCHAR(100)</text>
+    <text x="1123" y="345" class="field">position</text><text x="1375" y="345" text-anchor="end" class="type">INT</text>
+  </g>
+
+  <!-- collaborators -->
+  <g filter="url(#shadow)">
+    <rect x="545" y="590" width="450" height="350" rx="12" class="table"/>
+    <path d="M557 590 H983 A12 12 0 0 1 995 602 V645 H545 V602 A12 12 0 0 1 557 590" class="head"/>
+    <text x="567" y="626" class="tn">project_collaborators</text>
+    <text x="567" y="677" class="key">PK/FK</text><text x="625" y="677" class="field">project_id</text><text x="950" y="677" text-anchor="end" class="type">INT → projects.id</text>
+    <text x="567" y="718" class="key">PK/FK</text><text x="625" y="718" class="field">user_id</text><text x="950" y="718" text-anchor="end" class="type">INT → users.id</text>
+    <text x="567" y="759" class="key">FK</text><text x="625" y="759" class="field">invited_by</text><text x="950" y="759" text-anchor="end" class="type">INT → users.id</text>
+    <text x="625" y="800" class="field">status</text><text x="950" y="800" text-anchor="end" class="type">pending | accepted</text>
+    <text x="625" y="841" class="field">created_at</text><text x="950" y="841" text-anchor="end" class="type">TIMESTAMP</text>
+    <text x="625" y="892" class="note">Composite primary key: (project_id, user_id)</text>
+  </g>
+
+  <!-- tasks -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="590" width="470" height="390" rx="12" class="table"/>
+    <path d="M1072 590 H1518 A12 12 0 0 1 1530 602 V645 H1060 V602 A12 12 0 0 1 1072 590" class="head"/>
+    <text x="1082" y="626" class="tn">tasks</text>
+    <text x="1082" y="677" class="key">PK</text><text x="1123" y="677" class="field">id</text><text x="1485" y="677" text-anchor="end" class="type">INT</text>
+    <text x="1082" y="714" class="key">FK</text><text x="1123" y="714" class="field">column_id</text><text x="1485" y="714" text-anchor="end" class="type">INT → columns_table.id</text>
+    <text x="1123" y="751" class="field">title</text><text x="1485" y="751" text-anchor="end" class="type">VARCHAR(200)</text>
+    <text x="1123" y="788" class="field">description</text><text x="1485" y="788" text-anchor="end" class="type">TEXT</text>
+    <text x="1123" y="825" class="field">priority</text><text x="1485" y="825" text-anchor="end" class="type">low | medium | high</text>
+    <text x="1123" y="862" class="field">start_date / end_date</text><text x="1485" y="862" text-anchor="end" class="type">DATE</text>
+    <text x="1123" y="899" class="field">start_time / end_time</text><text x="1485" y="899" text-anchor="end" class="type">TIME</text>
+    <text x="1123" y="936" class="field">position / created_at</text><text x="1485" y="936" text-anchor="end" class="type">INT / TIMESTAMP</text>
+  </g>
+
+  <text x="70" y="1020" class="note">All foreign keys use ON DELETE CASCADE. N = many; UQ = unique constraint.</text>
+</svg>

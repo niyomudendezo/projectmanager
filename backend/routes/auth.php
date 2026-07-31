@@ -31,14 +31,14 @@ function handleAuth(string $method, array $segments): void {
             return;
         }
 
-        $stmt = $db->prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?)');
+        $stmt = $db->prepare('INSERT INTO users (name, email, password) VALUES (?, ?, ?) RETURNING id');
         $stmt->execute([$name, $email, password_hash($password, PASSWORD_BCRYPT)]);
-        $userId = (int)$db->lastInsertId();
+        $userId = (int)$stmt->fetchColumn();
 
         // Create default project
-        $stmt = $db->prepare('INSERT INTO projects (user_id, name, description) VALUES (?, ?, ?)');
+        $stmt = $db->prepare('INSERT INTO projects (user_id, name, description) VALUES (?, ?, ?) RETURNING id');
         $stmt->execute([$userId, 'My First Project', 'Welcome to your project board!']);
-        $projectId = (int)$db->lastInsertId();
+        $projectId = (int)$stmt->fetchColumn();
 
         // Create default columns
         foreach ([['To Do', 0], ['In Progress', 1], ['Done', 2]] as [$colName, $pos]) {

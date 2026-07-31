@@ -14,7 +14,7 @@ function handleInvitations(string $method, array $segments): void {
         $stmt->execute([$userId]);
         $invitations = $stmt->fetchAll();
         $tasksStmt = $db->prepare('SELECT t.id, t.title, t.description, t.priority, t.start_date, t.end_date, t.start_time, t.end_time, c.id AS column_id, c.name AS column_name FROM tasks t JOIN columns_table c ON c.id = t.column_id WHERE c.project_id = ? ORDER BY c.position, t.position');
-        $teamStmt = $db->prepare('SELECT u.id, u.name, u.email, "owner" AS role FROM projects p JOIN users u ON u.id = p.user_id WHERE p.id = ? UNION ALL SELECT u.id, u.name, u.email, "collaborator" AS role FROM project_collaborators pc JOIN users u ON u.id = pc.user_id WHERE pc.project_id = ? AND pc.status = "accepted"');
+        $teamStmt = $db->prepare("SELECT u.id, u.name, u.email, 'owner' AS role FROM projects p JOIN users u ON u.id = p.user_id WHERE p.id = ? UNION ALL SELECT u.id, u.name, u.email, 'collaborator' AS role FROM project_collaborators pc JOIN users u ON u.id = pc.user_id WHERE pc.project_id = ? AND pc.status = 'accepted'");
         foreach ($invitations as &$invitation) {
             $tasksStmt->execute([$invitation['project_id']]);
             $invitation['tasks'] = $tasksStmt->fetchAll();
@@ -26,7 +26,7 @@ function handleInvitations(string $method, array $segments): void {
     }
 
     if ($method === 'PUT' && $projectId && $action === 'accept') {
-        $stmt = $db->prepare('UPDATE project_collaborators SET status = "accepted" WHERE project_id = ? AND user_id = ? AND status = "pending"');
+        $stmt = $db->prepare("UPDATE project_collaborators SET status = 'accepted' WHERE project_id = ? AND user_id = ? AND status = 'pending'");
         $stmt->execute([$projectId, $userId]);
         if (!$stmt->rowCount()) { http_response_code(404); echo json_encode(['error' => 'Pending invitation not found']); return; }
         echo json_encode(['success' => true, 'project_id' => $projectId]);

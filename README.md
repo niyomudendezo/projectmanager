@@ -1,6 +1,6 @@
 # 📋 ProjectManager
 
-A full-stack Kanban-based project management web application built with **React + TypeScript** (frontend) and **PHP + MySQL** (backend). Inspired by tools like Trello, Asana, and Monday.com.
+A full-stack Kanban-based project management web application built with **React + TypeScript** (frontend), **PHP** (backend), and **Supabase PostgreSQL** (database). Inspired by tools like Trello, Asana, and Monday.com.
 
 🔗 **Live Repository:** [https://github.com/niyomudendezo/projectmanager](https://github.com/niyomudendezo/projectmanager)
 
@@ -31,7 +31,7 @@ A full-stack Kanban-based project management web application built with **React 
 | HTTP      | Axios                                   |
 | Routing   | React Router DOM v7                     |
 | Backend   | PHP 8+, Apache (.htaccess routing)      |
-| Database  | MySQL 8                                 |
+| Database  | Supabase PostgreSQL                     |
 | Auth      | JWT (JSON Web Tokens)                   |
 | Server    | XAMPP / LAMPP                           |
 
@@ -78,7 +78,7 @@ projectmanager/
 - [XAMPP](https://www.apachefriends.org/) or [LAMPP](https://www.apachefriends.org/index.html) installed
 - Node.js v18+ and npm
 - PHP 8+
-- MySQL 8
+- A Supabase project
 
 ---
 
@@ -91,16 +91,12 @@ cd projectmanager
 
 ---
 
-### 2. Database Setup
+### 2. Supabase Database Setup
 
-1. Start **MySQL** from XAMPP/LAMPP control panel
-2. Open **phpMyAdmin** at `http://localhost/phpmyadmin`
-3. Click **Import** → select `database.sql` → click **Go**
-
-Or via terminal:
-```bash
-mysql -u root -p < database.sql
-```
+1. Create a Supabase project.
+2. Open **SQL Editor**, create a new query, paste `database.sql`, and click **Run**.
+3. Open **Connect** and copy the **Transaction pooler** connection string.
+4. Set `DATABASE_URL` and `JWT_SECRET` in the PHP server environment. See `.env.example` and `SUPABASE_SETUP.md`.
 
 ---
 
@@ -115,17 +111,12 @@ mysql -u root -p < database.sql
    # Copy to C:\xampp\htdocs\projectmanager
    ```
 
-2. Edit `backend/config/database.php` with your DB credentials:
-   ```php
-   $host = 'localhost';
-   $db   = 'projectmanager';
-   $user = 'root';
-   $pass = '';          // your MySQL password
-   ```
+2. Ensure the PHP `pdo_pgsql` extension is enabled.
 
-3. Edit `backend/config/jwt.php` and set a secret key:
-   ```php
-   define('JWT_SECRET', 'your-secret-key-here');
+3. Configure the server environment:
+   ```env
+   DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@POOLER_HOST:6543/postgres?sslmode=require
+   JWT_SECRET=replace-with-a-long-random-secret
    ```
 
 4. Make sure **Apache** is running from XAMPP/LAMPP
