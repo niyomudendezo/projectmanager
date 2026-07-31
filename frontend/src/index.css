@@ -635,8 +635,8 @@ button { cursor: pointer; border: none; border-radius: var(--radius); font-size:
 .task-roadmap-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
 .task-roadmap-title h1 { margin: 9px 0 6px; color: #263247; font-size: 1.65rem; line-height: 1.2; overflow-wrap: anywhere; }
 .task-roadmap-title p { color: #8792a4; font-size: 0.78rem; }
-.task-roadmap-content { max-width: 1250px; margin: auto; padding: 26px 32px 50px; }
-.task-roadmap-panel { border: 1px solid #e2e7ed; border-radius: 10px; background: #fff; box-shadow: 0 3px 10px rgba(29,42,67,.035); }
+.task-roadmap-content { width: 100%; padding: 26px 32px 50px; }
+.task-roadmap-panel { border: 1px solid #e2e7ed; border-radius: 10px; background: #fff; box-shadow: 0 3px 10px rgba(29,42,67,.035); width: 100%; }
 .task-roadmap-panel-title { min-height: 66px; padding: 15px 19px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf0f4; }
 .task-roadmap-panel-title h2 { margin-bottom: 4px; color: #303c53; font-size: 0.9rem; }
 .task-roadmap-panel-title p { color: #929bad; font-size: 0.68rem; }
@@ -654,7 +654,7 @@ button { cursor: pointer; border: none; border-radius: var(--radius); font-size:
 .task-roadmap-step.complete b { color: #278d70; }
 .task-roadmap-step.current > div { border-color: #5b4dde; color: #5b4dde; box-shadow: 0 0 0 5px #eeecff; }
 .task-roadmap-step.current b { color: #5145bc; }
-.task-roadmap-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .7fr); gap: 18px; margin-top: 18px; }
+.task-roadmap-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .7fr); gap: 18px; margin-top: 18px; width: 100%; }
 .task-date-roadmap { min-height: 150px; padding: 25px; display: grid; grid-template-columns: 1fr minmax(70px,.5fr) 1fr; align-items: center; }
 .task-date-roadmap article { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .task-date-roadmap article:last-child { text-align: right; }

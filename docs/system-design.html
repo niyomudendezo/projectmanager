@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ProjectManager — System Design</title>
+  <style>
+    @page { size: A4; margin: 16mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #172033; font: 14px/1.5 Arial, sans-serif; }
+    h1, h2, h3 { color: #182b62; margin: 0 0 10px; }
+    h1 { font-size: 30px; } h2 { font-size: 21px; border-bottom: 2px solid #dce4ff; padding-bottom: 5px; }
+    h3 { font-size: 15px; margin-top: 14px; }
+    p { margin: 7px 0; }
+    .cover { min-height: 255mm; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+    .cover .mark { width: 82px; height: 82px; margin: 0 auto 24px; border-radius: 22px; background: #4967df; color: white; display: grid; place-items: center; font-size: 42px; }
+    .subtitle { color: #52617f; font-size: 18px; }
+    .meta { margin-top: 50px; color: #66718a; }
+    .page { break-before: page; }
+    .diagram { background: #f7f9ff; border: 1px solid #dce4ff; border-radius: 12px; padding: 18px; margin: 14px 0; }
+    .row { display: flex; gap: 12px; align-items: stretch; justify-content: center; }
+    .box { flex: 1; background: white; border: 2px solid #91a5ef; border-radius: 9px; padding: 12px; text-align: center; }
+    .box strong { display: block; color: #253d92; margin-bottom: 5px; }
+    .arrow { display: grid; place-items: center; min-width: 35px; color: #4967df; font-size: 24px; }
+    .down { text-align: center; color: #4967df; font-size: 24px; line-height: 1; margin: 5px; }
+    .note { background: #eef2ff; border-left: 4px solid #4967df; padding: 10px 12px; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 12.5px; }
+    th, td { border: 1px solid #d9dfec; padding: 7px; vertical-align: top; text-align: left; }
+    th { background: #eef2ff; color: #253d72; }
+    ul { margin: 6px 0; padding-left: 21px; }
+    .flow { display: flex; align-items: center; gap: 6px; margin: 12px 0; }
+    .step { flex: 1; min-height: 68px; border: 1px solid #aebbec; border-radius: 8px; padding: 8px; text-align: center; background: white; }
+    .small { color: #65708a; font-size: 12px; }
+    .entity { flex: 1; border: 1px solid #8ca0e7; border-radius: 8px; overflow: hidden; background: white; }
+    .entity b { display: block; background: #4967df; color: white; padding: 6px 7px; font-size: 12px; }
+    .entity div { padding: 7px 9px; font-size: 11px; }
+    code { background: #edf0f7; padding: 1px 4px; border-radius: 3px; }
+    footer { margin-top: 24px; padding-top: 7px; border-top: 1px solid #d9dfec; color: #788197; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <div class="mark">✓</div>
+    <h1>ProjectManager</h1>
+    <p class="subtitle">System Design Document</p>
+    <p>Full-stack collaborative Kanban project management application</p>
+    <div class="meta">Version 1.0<br>31 July 2026<br>Repository: github.com/niyomudendezo/projectmanager</div>
+  </section>
+
+  <section class="page">
+    <h2>1. Purpose and Scope</h2>
+    <p>ProjectManager lets registered users create projects, organize work on Kanban boards, track priority and schedules, and invite registered collaborators. This document describes the implemented architecture, data model, interfaces, security boundaries, and deployment model.</p>
+    <h3>Primary capabilities</h3>
+    <ul>
+      <li>Account registration and JWT-based sign-in.</li>
+      <li>Project creation, editing, deletion, dashboard statistics, and progress.</li>
+      <li>Configurable board columns and drag-and-drop task movement.</li>
+      <li>Task metadata: description, priority, dates, times, and position.</li>
+      <li>Project invitations with pending and accepted states.</li>
+    </ul>
+
+    <h2>2. Architecture Overview</h2>
+    <div class="diagram">
+      <div class="row">
+        <div class="box"><strong>User Browser</strong>Desktop or mobile web client</div>
+        <div class="arrow">⇄</div>
+        <div class="box"><strong>React SPA</strong>React 19 · TypeScript · Vite<br>Zustand · Axios · dnd-kit</div>
+      </div>
+      <div class="down">⇅ <span class="small">HTTPS / JSON REST + Bearer JWT</span></div>
+      <div class="row">
+        <div class="box"><strong>Apache Web Server</strong>Static frontend delivery<br><code>.htaccess</code> API routing</div>
+        <div class="arrow">→</div>
+        <div class="box"><strong>PHP REST API</strong>Front controller · Route handlers<br>Authentication middleware</div>
+      </div>
+      <div class="down">⇅ <span class="small">PDO prepared statements</span></div>
+      <div class="row"><div class="box"><strong>MySQL 8</strong>Users · Projects · Collaborators · Columns · Tasks</div></div>
+    </div>
+    <p>The system uses a three-tier client/server architecture. The browser renders the single-page application. Axios calls a PHP JSON API through one front controller. PHP performs authorization and persistence through PDO; MySQL enforces relationships and cascading cleanup.</p>
+    <div class="note"><strong>Design intent:</strong> Keep deployment simple for XAMPP/LAMPP while separating presentation, business/API logic, and persistent data.</div>
+  </section>
+
+  <section class="page">
+    <h2>3. Component Design</h2>
+    <table>
+      <tr><th>Layer</th><th>Components</th><th>Responsibilities</th></tr>
+      <tr><td>Presentation</td><td>Pages, Navbar, Sidebar, KanbanBoard, modals, cards</td><td>Routing, responsive UI, forms, board interactions, visual task state.</td></tr>
+      <tr><td>Client state</td><td>Zustand authStore and boardStore</td><td>Current user/session view, project/column/task state, API actions.</td></tr>
+      <tr><td>Transport</td><td>Axios client</td><td>Base API path, JWT injection, centralized 401 logout behavior.</td></tr>
+      <tr><td>API entry</td><td><code>backend/index.php</code></td><td>CORS, JSON responses, request parsing, resource dispatch, error boundary.</td></tr>
+      <tr><td>Domain routes</td><td>auth, projects, columns, tasks, invitations</td><td>Validation, authorization, CRUD, task movement, collaboration workflow.</td></tr>
+      <tr><td>Security</td><td>JWT helpers and auth middleware</td><td>Token creation/validation and authenticated user identity.</td></tr>
+      <tr><td>Persistence</td><td>PDO database connector and MySQL schema</td><td>Prepared queries, constraints, ordering, relational integrity.</td></tr>
+    </table>
+
+    <h2>4. Main Request Flows</h2>
+    <h3>Authentication</h3>
+    <div class="flow">
+      <div class="step">1<br>User submits credentials</div><div>→</div>
+      <div class="step">2<br>API validates input / bcrypt hash</div><div>→</div>
+      <div class="step">3<br>API signs JWT containing user identity</div><div>→</div>
+      <div class="step">4<br>Client stores token and sends Bearer header</div>
+    </div>
+    <h3>Load and update a board</h3>
+    <div class="flow">
+      <div class="step">1<br>Protected route loads project</div><div>→</div>
+      <div class="step">2<br>Middleware verifies JWT</div><div>→</div>
+      <div class="step">3<br>API checks owner or accepted collaborator</div><div>→</div>
+      <div class="step">4<br>Nested columns/tasks returned as JSON</div>
+    </div>
+    <p>When a task is dragged, the client sends the destination column and position to the task move endpoint. The persisted order becomes the source of truth and the board state is refreshed or reconciled.</p>
+    <h3>Collaboration</h3>
+    <p>Only a project owner can invite a registered user. The join table records the inviter and a <code>pending</code> status. After acceptance, the collaborator can load the project; owner-only operations remain restricted.</p>
+  </section>
+
+  <section class="page">
+    <h2>5. Data Model</h2>
+    <div class="diagram">
+      <div class="row">
+        <div class="entity"><b>users</b><div>PK id<br>name<br>UQ email<br>password_hash<br>created_at</div></div>
+        <div class="arrow">1 → N</div>
+        <div class="entity"><b>projects</b><div>PK id<br>FK user_id<br>name<br>description<br>created_at</div></div>
+        <div class="arrow">1 → N</div>
+        <div class="entity"><b>columns_table</b><div>PK id<br>FK project_id<br>name<br>position</div></div>
+        <div class="arrow">1 → N</div>
+        <div class="entity"><b>tasks</b><div>PK id<br>FK column_id<br>title / description<br>priority / schedule<br>position</div></div>
+      </div>
+      <div class="down">↘</div>
+      <div class="row">
+        <div class="entity"><b>project_collaborators</b><div>PK/FK project_id + user_id<br>FK invited_by → users<br>status: pending | accepted<br>created_at</div></div>
+      </div>
+    </div>
+    <p>Users own many projects. Projects contain ordered columns, and columns contain ordered tasks. Users and projects have a many-to-many collaboration relationship with invitation metadata. Foreign keys use <code>ON DELETE CASCADE</code>, so deleting an owner/project/column removes dependent records consistently.</p>
+
+    <h2>6. API Surface</h2>
+    <table>
+      <tr><th>Resource</th><th>Representative operations</th><th>Access</th></tr>
+      <tr><td>Auth</td><td><code>POST /auth/register</code>, <code>POST /auth/login</code></td><td>Public</td></tr>
+      <tr><td>Projects</td><td>List/create; get/update/delete by ID; manage collaborators</td><td>Authenticated; ownership rules vary by operation</td></tr>
+      <tr><td>Columns</td><td>Create, rename, delete</td><td>Authenticated and project-scoped</td></tr>
+      <tr><td>Tasks</td><td>Create, update, delete, move</td><td>Authenticated and project-scoped</td></tr>
+      <tr><td>Invitations</td><td>List invitations; accept an invitation</td><td>Authenticated invitee</td></tr>
+    </table>
+    <p>Responses use JSON and standard HTTP status codes including 201, 204, 400, 401, 403, 404, 409, and 500.</p>
+  </section>
+
+  <section class="page">
+    <h2>7. Security and Reliability</h2>
+    <ul>
+      <li>Passwords are hashed using PHP's bcrypt-backed password API and are never returned.</li>
+      <li>Protected endpoints require a signed JWT in the Authorization header.</li>
+      <li>Resource queries enforce owner/collaborator scope; collaborator management and project mutation include owner checks.</li>
+      <li>PDO prepared statements reduce SQL-injection risk, and input checks reject invalid or missing fields.</li>
+      <li>Database foreign keys preserve referential integrity and cascades prevent orphan records.</li>
+      <li>The API has a common exception boundary that emits a JSON server-error response.</li>
+    </ul>
+    <div class="note"><strong>Production hardening:</strong> Serve only over HTTPS; load database credentials and a strong JWT secret from environment configuration; restrict CORS to the deployed frontend origin; avoid exposing exception details; add token expiry/refresh or secure HttpOnly cookies; implement rate limiting, audit logs, automated backups, and CSRF protection if cookie-based sessions are adopted.</div>
+
+    <h2>8. Deployment</h2>
+    <div class="diagram">
+      <div class="row">
+        <div class="box"><strong>Client Device</strong>Modern web browser</div><div class="arrow">HTTPS</div>
+        <div class="box"><strong>XAMPP / LAMPP Host</strong>Apache serves Vite build<br>PHP 8 executes API</div><div class="arrow">TCP</div>
+        <div class="box"><strong>MySQL 8</strong><code>projectmanager</code> database</div>
+      </div>
+    </div>
+    <p>The current target is a single-host deployment suited to development, demonstration, and small workloads. Frontend assets are compiled with Vite and served by Apache. The PHP API and MySQL can run on the same host. A production evolution can place the database on a managed service, add a reverse proxy/TLS endpoint, and deploy multiple stateless API instances because session identity is carried by JWT.</p>
+
+    <h2>9. Quality Attributes and Trade-offs</h2>
+    <table>
+      <tr><th>Attribute</th><th>Current approach</th><th>Future direction</th></tr>
+      <tr><td>Maintainability</td><td>Routes separated by domain; typed component/state layer</td><td>Service/repository layers and automated API tests</td></tr>
+      <tr><td>Performance</td><td>Simple direct queries; nested board response minimizes client round trips</td><td>Indexes, pagination, query consolidation, caching</td></tr>
+      <tr><td>Scalability</td><td>Stateless JWT API; simple single-host deployment</td><td>Horizontal API scaling and managed database</td></tr>
+      <tr><td>Availability</td><td>Database constraints and common error handling</td><td>Health checks, monitoring, backups, replication</td></tr>
+      <tr><td>Security</td><td>bcrypt, JWT, prepared statements, resource checks</td><td>Secret management, expiry/refresh, strict CORS, rate limiting</td></tr>
+    </table>
+    <footer>ProjectManager System Design · Version 1.0 · Based on the implemented repository architecture</footer>
+  </section>
+</body>
+</html>
