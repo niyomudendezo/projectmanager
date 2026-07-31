@@ -58,7 +58,7 @@ CREATE INDEX IF NOT EXISTS idx_tasks_column_position
 CREATE INDEX IF NOT EXISTS idx_collaborators_user_status
   ON public.project_collaborators(user_id, status);
 
--- The PHP API is the only database client. Do not expose these application
+-- The Express API is the only database client. Do not expose these application
 -- tables directly through Supabase's Data API.
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;

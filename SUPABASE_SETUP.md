@@ -1,6 +1,6 @@
 # Supabase setup
 
-The application keeps authentication and authorization in the PHP API. Supabase
+The application keeps authentication and authorization in the Express API. Supabase
 is used as hosted PostgreSQL; the React frontend never receives database
 credentials or a Supabase service key.
 
@@ -12,17 +12,18 @@ credentials or a Supabase service key.
 
 The script creates all tables, relationships, constraints, and indexes. Row Level
 Security is enabled to prevent browser access through the Supabase Data API. The
-PHP server connects with the database role and performs the application's own JWT
+Node server connects with the service role and performs the application's own JWT
 and resource authorization.
 
-## 2. Copy the server connection
+## 2. Connect it in Hostinger
 
-In Supabase, open **Connect** and choose **Transaction pooler**. Use its URI as the
-server-side `DATABASE_URL`. The pooler is preferred for hosted web apps and is
-usually available over IPv4.
+In the Hostinger Node.js Web App dashboard, go to **Database**, click **Connect**,
+choose **Supabase**, authorize your Supabase account, and select this project.
+Hostinger adds the connection variables and triggers a deployment automatically.
 
 ```env
-DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@POOLER_HOST:6543/postgres?sslmode=require
+SUPABASE_URL=https://PROJECT_REF.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_SIDE_SERVICE_ROLE_KEY
 JWT_SECRET=GENERATE_A_LONG_RANDOM_VALUE
 ```
 
@@ -36,22 +37,21 @@ You can generate a JWT secret locally with:
 openssl rand -hex 32
 ```
 
-If the host presents separate connection fields instead of a URI, use the
-`SUPABASE_DB_*` variables documented in `.env.example`.
-
-## 3. PHP requirement
-
-The deployed PHP runtime must enable the `pdo_pgsql` extension. Verify it with:
-
-```bash
-php -m | grep pdo_pgsql
-```
+The server recognizes `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_KEY`, and the common
+anon-key names. A service-role key is required with the secure RLS configuration
+in `database.sql`; never expose that key through a `VITE_` variable or browser code.
 
 ## 4. Verify
 
-After deploying, register a new account through the application. A successful
+After deployment, open `/api/health`. A working connection returns:
+
+```json
+{"status":"ok","database":"connected","supabase_url_configured":true}
+```
+
+Then register a new account through the application. A successful
 registration creates a user, a starter project, and the default To Do, In
 Progress, and Done columns in Supabase.
 
-If the API reports that configuration is missing, confirm that `DATABASE_URL` and
-`JWT_SECRET` are defined for the PHP process and restart/redeploy the web app.
+If the API reports missing configuration, confirm that the Supabase variables and
+`JWT_SECRET` exist under Hostinger **Environment Variables**, then redeploy.

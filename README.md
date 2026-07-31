@@ -1,6 +1,6 @@
 # 📋 ProjectManager
 
-A full-stack Kanban-based project management web application built with **React + TypeScript** (frontend), **PHP** (backend), and **Supabase PostgreSQL** (database). Inspired by tools like Trello, Asana, and Monday.com.
+A full-stack Kanban-based project management web application built with **React + TypeScript**, **Node.js/Express**, and **Supabase PostgreSQL**. Inspired by tools like Trello, Asana, and Monday.com.
 
 🔗 **Live Repository:** [https://github.com/niyomudendezo/projectmanager](https://github.com/niyomudendezo/projectmanager)
 
@@ -30,10 +30,10 @@ A full-stack Kanban-based project management web application built with **React 
 | Drag & Drop | @dnd-kit/core, @dnd-kit/sortable      |
 | HTTP      | Axios                                   |
 | Routing   | React Router DOM v7                     |
-| Backend   | PHP 8+, Apache (.htaccess routing)      |
+| Backend   | Node.js 20+, Express                    |
 | Database  | Supabase PostgreSQL                     |
 | Auth      | JWT (JSON Web Tokens)                   |
-| Server    | XAMPP / LAMPP                           |
+| Server    | Hostinger Node.js Web App               |
 
 ---
 
@@ -75,9 +75,7 @@ projectmanager/
 
 ### Prerequisites
 
-- [XAMPP](https://www.apachefriends.org/) or [LAMPP](https://www.apachefriends.org/index.html) installed
-- Node.js v18+ and npm
-- PHP 8+
+- Node.js v20+ and npm
 - A Supabase project
 
 ---
@@ -100,24 +98,23 @@ cd projectmanager
 
 ---
 
-### 3. Backend Setup
+### 3. Server Setup
 
-1. Copy the project to your web server root:
-   ```bash
-   # For LAMPP on Linux
-   sudo cp -r projectmanager /opt/lampp/htdocs/
-
-   # For XAMPP on Windows
-   # Copy to C:\xampp\htdocs\projectmanager
-   ```
-
-2. Ensure the PHP `pdo_pgsql` extension is enabled.
-
-3. Configure the server environment:
+1. Configure the server environment:
    ```env
-   DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@POOLER_HOST:6543/postgres?sslmode=require
+   SUPABASE_URL=https://PROJECT_REF.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=replace-with-server-side-key
    JWT_SECRET=replace-with-a-long-random-secret
    ```
+
+2. Install and run locally:
+   ```bash
+   npm install
+   npm run build
+   npm start
+   ```
+
+3. Verify the database at `http://localhost:3000/api/health`.
 
 4. Make sure **Apache** is running from XAMPP/LAMPP
 
@@ -135,17 +132,12 @@ cd frontend
 npm install
 ```
 
-Create a `.env` file inside `frontend/`:
-```env
-VITE_API_URL=http://localhost/projectmanager/backend
-```
-
-Start the development server:
+Start only the Vite development server when working on frontend UI:
 ```bash
 npm run dev
 ```
 
-The app will be available at: **http://localhost:5173**
+The complete production-style app is served by Express at **http://localhost:3000**.
 
 ---
 
