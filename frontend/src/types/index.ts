@@ -1,12 +1,12 @@
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
 }
 
 export interface Task {
-  id: number;
-  column_id: number;
+  id: string;
+  column_id: string;
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high';
@@ -19,16 +19,16 @@ export interface Task {
 }
 
 export interface Column {
-  id: number;
-  project_id: number;
+  id: string;
+  project_id: string;
   name: string;
   position: number;
   tasks: Task[];
 }
 
 export interface Project {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   name: string;
   description: string;
   created_at: string;

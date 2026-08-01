@@ -3,7 +3,7 @@ import axios from 'axios';
 import api from '../api/client';
 
 interface Collaborator {
-  id: number;
+  id: string;
   name: string;
   email: string;
   status?: 'pending' | 'accepted';
@@ -11,7 +11,7 @@ interface Collaborator {
 }
 
 interface Props {
-  projectId: number;
+  projectId: string;
   onClose: () => void;
 }
 

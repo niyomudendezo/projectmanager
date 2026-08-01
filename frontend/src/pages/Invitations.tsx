@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import { useBoardStore } from '../store/boardStore';
 
 interface Invitation {
-  project_id: number;
+  project_id: string;
   project_name: string;
   project_description: string;
   invited_by_name: string;
@@ -14,11 +14,11 @@ interface Invitation {
   task_count: number;
   created_at: string;
   tasks: Array<{
-    id: number;
+    id: string;
     title: string;
     description: string;
     priority: 'low' | 'medium' | 'high';
-    column_id: number;
+    column_id: string;
     column_name: string;
     start_date: string | null;
     end_date: string | null;
@@ -32,9 +32,9 @@ export default function Invitations() {
   const { fetchProjects } = useBoardStore();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [accepting, setAccepting] = useState<number | null>(null);
+  const [accepting, setAccepting] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [expandedProjectId, setExpandedProjectId] = useState<number | null>(null);
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProjects();
@@ -44,7 +44,7 @@ export default function Invitations() {
       .finally(() => setLoading(false));
   }, [fetchProjects]);
 
-  const accept = async (projectId: number) => {
+  const accept = async (projectId: string) => {
     setAccepting(projectId);
     setError('');
     try {

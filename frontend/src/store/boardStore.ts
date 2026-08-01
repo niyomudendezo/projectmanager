@@ -9,18 +9,18 @@ interface BoardState {
   error: string | null;
 
   fetchProjects: () => Promise<void>;
-  fetchProject: (id: number) => Promise<void>;
+  fetchProject: (id: string) => Promise<void>;
   createProject: (name: string, description: string) => Promise<void>;
-  deleteProject: (id: number) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
 
-  addColumn: (projectId: number, name: string) => Promise<void>;
-  deleteColumn: (columnId: number) => Promise<void>;
-  renameColumn: (columnId: number, name: string) => Promise<void>;
+  addColumn: (projectId: string, name: string) => Promise<void>;
+  deleteColumn: (columnId: string) => Promise<void>;
+  renameColumn: (columnId: string, name: string) => Promise<void>;
 
-  addTask: (columnId: number, title: string, description: string, priority: Task['priority'], schedule: Pick<Task, 'start_date' | 'end_date' | 'start_time' | 'end_time'>) => Promise<void>;
-  updateTask: (taskId: number, title: string, description: string, priority: Task['priority'], schedule: Pick<Task, 'start_date' | 'end_date' | 'start_time' | 'end_time'>) => Promise<void>;
-  deleteTask: (taskId: number) => Promise<void>;
-  moveTask: (taskId: number, newColumnId: number, newPosition: number) => Promise<void>;
+  addTask: (columnId: string, title: string, description: string, priority: Task['priority'], schedule: Pick<Task, 'start_date' | 'end_date' | 'start_time' | 'end_time'>) => Promise<void>;
+  updateTask: (taskId: string, title: string, description: string, priority: Task['priority'], schedule: Pick<Task, 'start_date' | 'end_date' | 'start_time' | 'end_time'>) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
+  moveTask: (taskId: string, newColumnId: string, newPosition: number) => Promise<void>;
 }
 
 export const useBoardStore = create<BoardState>((set, get) => ({

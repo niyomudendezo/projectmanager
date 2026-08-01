@@ -6,7 +6,7 @@ import { useBoardStore } from '../store/boardStore';
 import type { Task } from '../types';
 
 interface RoadmapColumn {
-  id: number;
+  id: string;
   name: string;
   position: number;
 }
@@ -14,7 +14,7 @@ interface RoadmapColumn {
 interface RoadmapTask extends Task {
   column_name: string;
   column_position: number;
-  project_id: number;
+  project_id: string;
   project_name: string;
   project_description: string;
   project_columns: RoadmapColumn[];

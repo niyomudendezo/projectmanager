@@ -5,14 +5,14 @@ import Sidebar from '../components/Sidebar';
 import { useBoardStore } from '../store/boardStore';
 
 interface TeamMember {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: 'owner' | 'collaborator';
 }
 
 interface TeamProject {
-  project_id: number;
+  project_id: string;
   project_name: string;
   project_description: string;
   status: 'pending' | 'accepted';

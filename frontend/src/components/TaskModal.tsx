@@ -3,7 +3,7 @@ import type { Task } from '../types';
 import { useBoardStore } from '../store/boardStore';
 
 interface Props {
-  columnId?: number;
+  columnId?: string;
   task?: Task;
   onClose: () => void;
 }

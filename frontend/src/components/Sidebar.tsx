@@ -9,9 +9,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const [expandedProjectId, setExpandedProjectId] = useState<number | null>(() => {
-    const boardId = location.pathname.startsWith('/board/') ? Number(location.pathname.split('/')[2]) : null;
-    return boardId && !Number.isNaN(boardId) ? boardId : null;
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(() => {
+    return location.pathname.startsWith('/board/') ? location.pathname.split('/')[2] || null : null;
   });
 
   const handleLogout = () => { logout(); navigate('/login'); };

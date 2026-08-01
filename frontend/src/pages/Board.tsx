@@ -15,12 +15,12 @@ export default function Board() {
   const [showSearch, setShowSearch] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
-  const [statusFilter, setStatusFilter] = useState<number | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<string | 'all'>('all');
   const [showCollaboration, setShowCollaboration] = useState(false);
 
   useEffect(() => {
     fetchProjects();
-    if (id) fetchProject(Number(id));
+    if (id) fetchProject(id);
   }, [id, fetchProject, fetchProjects]);
 
   const columns = activeProject?.columns ?? [];
@@ -124,7 +124,7 @@ export default function Board() {
                     ))}
                   </div>
                   <label>Status</label>
-                  <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value === 'all' ? 'all' : Number(event.target.value))}>
+                  <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
                     <option value="all">All statuses</option>
                     {columns.map((column) => <option key={column.id} value={column.id}>{column.name} ({column.tasks.length})</option>)}
                   </select>
@@ -149,7 +149,7 @@ export default function Board() {
               <p>Loading tasks from your workspace…</p>
             </div>
           )}
-          {error && <div className="wrike-board-error"><span>!</span><p>{error}</p><button onClick={() => id && fetchProject(Number(id))}>Try again</button></div>}
+          {error && <div className="wrike-board-error"><span>!</span><p>{error}</p><button onClick={() => id && fetchProject(id)}>Try again</button></div>}
           {!loading && activeProject && view === 'board' && <KanbanBoard search={search} priority={priorityFilter} status={statusFilter} />}
           {!loading && activeProject && view === 'list' && (
             <div className="wrike-list-view">

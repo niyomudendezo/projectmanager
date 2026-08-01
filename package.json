@@ -2,7 +2,7 @@
   "name": "projectmanager",
   "version": "1.0.0",
   "private": true,
-  "description": "ProjectManager React application with an Express and Supabase backend",
+  "description": "ProjectManager React application with an Express and MongoDB backend",
   "main": "server.js",
   "scripts": {
     "dev": "node --watch server.js",
@@ -14,10 +14,10 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.18.0"
   }
 }

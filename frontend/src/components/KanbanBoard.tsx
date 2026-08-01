@@ -10,7 +10,7 @@ import KanbanColumn from './KanbanColumn';
 interface KanbanBoardProps {
   search?: string;
   priority?: 'all' | 'low' | 'medium' | 'high';
-  status?: number | 'all';
+  status?: string | 'all';
 }
 
 export default function KanbanBoard({ search = '', priority = 'all', status = 'all' }: KanbanBoardProps) {
@@ -38,7 +38,7 @@ export default function KanbanBoard({ search = '', priority = 'all', status = 'a
     const taskId = active.data.current?.task?.id;
     if (!taskId) return;
 
-    let targetColumnId: number;
+    let targetColumnId: string;
     let targetPosition: number;
 
     if (over.data.current?.type === 'column') {
@@ -54,7 +54,7 @@ export default function KanbanBoard({ search = '', priority = 'all', status = 'a
       // Fallback for nested DOM targets: resolve a target column from its id.
       const overId = String(over.id);
       if (!overId.startsWith('col-')) return;
-      targetColumnId = Number(overId.replace('col-', ''));
+      targetColumnId = overId.replace('col-', '');
       const col = columns.find((c) => c.id === targetColumnId);
       targetPosition = col?.tasks.length ?? 0;
     }

@@ -1,6 +1,6 @@
 # 📋 ProjectManager
 
-A full-stack Kanban-based project management web application built with **React + TypeScript**, **Node.js/Express**, and **Supabase PostgreSQL**. Inspired by tools like Trello, Asana, and Monday.com.
+A full-stack Kanban-based project management web application built with **React + TypeScript**, **Node.js/Express**, and **MongoDB Atlas**. Inspired by tools like Trello, Asana, and Monday.com.
 
 🔗 **Live Repository:** [https://github.com/niyomudendezo/projectmanager](https://github.com/niyomudendezo/projectmanager)
 
@@ -31,7 +31,7 @@ A full-stack Kanban-based project management web application built with **React 
 | HTTP      | Axios                                   |
 | Routing   | React Router DOM v7                     |
 | Backend   | Node.js 20+, Express                    |
-| Database  | Supabase PostgreSQL                     |
+| Database  | MongoDB Atlas                           |
 | Auth      | JWT (JSON Web Tokens)                   |
 | Server    | Hostinger Node.js Web App               |
 
@@ -65,7 +65,8 @@ projectmanager/
 │   │   └── index.css          # Global styles
 │   ├── package.json
 │   └── vite.config.ts
-├── database.sql               # Database schema
+├── db.js                      # MongoDB connection
+├── server.js                  # Express API and static server
 └── README.md
 ```
 
@@ -76,7 +77,7 @@ projectmanager/
 ### Prerequisites
 
 - Node.js v20+ and npm
-- A Supabase project
+- A MongoDB Atlas deployment or Hostinger MongoDB connection
 
 ---
 
@@ -89,12 +90,12 @@ cd projectmanager
 
 ---
 
-### 2. Supabase Database Setup
+### 2. MongoDB Database Setup
 
-1. Create a Supabase project.
-2. Open **SQL Editor**, create a new query, paste `database.sql`, and click **Run**.
-3. Open **Connect** and copy the **Transaction pooler** connection string.
-4. Set `DATABASE_URL` and `JWT_SECRET` in the PHP server environment. See `.env.example` and `SUPABASE_SETUP.md`.
+1. In the Hostinger Web App dashboard, select **Database → Connect → MongoDB Atlas**.
+2. Complete the Atlas connection flow.
+3. Confirm `MONGODB_URI` is available to the Web App and add `JWT_SECRET`.
+4. See `MONGODB_SETUP.md` for verification and manual configuration.
 
 ---
 
@@ -102,8 +103,8 @@ cd projectmanager
 
 1. Configure the server environment:
    ```env
-   SUPABASE_URL=https://PROJECT_REF.supabase.co
-   SUPABASE_API_KEY=automatically-added-by-hostinger
+   MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/?retryWrites=true&w=majority
+   MONGODB_DATABASE=projectmanager
    JWT_SECRET=replace-with-a-long-random-secret
    ```
 
