@@ -3,8 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { ObjectId } = require('mongodb');
-const { getDb, checkDatabase, mongoUri } = require('./db');
+const { randomUUID } = require('crypto');
+const { getDb, checkDatabase, config } = require('./db');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -12,10 +12,11 @@ app.disable('x-powered-by');
 app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
 app.use(express.json({ limit: '1mb' }));
 
-const oid = (value) => ObjectId.isValid(String(value)) ? new ObjectId(String(value)) : null;
+const oid = (value) => value ? String(value) : null;
+const newId = () => randomUUID();
 const now = () => new Date();
 const defaultColumns = () => ['To Do', 'In Progress', 'Done'].map((name, position) => ({
-  _id: new ObjectId(), name, position, tasks: [],
+  _id: newId(), name, position, tasks: [],
 }));
 
 function secret() {
@@ -80,8 +81,8 @@ async function projectContainingTask(id) {
 }
 
 app.get('/api/health', async (_req, res) => {
-  try { await checkDatabase(); res.json({ status: 'ok', database: 'connected', provider: 'mongodb', database_name: process.env.MONGODB_DATABASE || 'projectmanager' }); }
-  catch (error) { res.status(503).json({ status: 'error', database: 'disconnected', provider: 'mongodb', configured: Boolean(mongoUri()), error: error.message }); }
+  try { await checkDatabase(); res.json({ status: 'ok', database: 'connected', provider: 'mysql', database_name: config().database }); }
+  catch (error) { const c = config(); res.status(503).json({ status: 'error', database: 'disconnected', provider: 'mysql', configured: Boolean(c.user && c.password && c.database), error: error.message }); }
 });
 
 app.post('/api/auth/register', async (req, res) => {
@@ -93,9 +94,9 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const db = await getDb();
     if (await db.collection('users').findOne({ email })) return res.status(409).json({ error: 'Email already registered' });
-    const user = { _id: new ObjectId(), name, email, password: await bcrypt.hash(password, 12), created_at: now() };
+    const user = { _id: newId(), name, email, password: await bcrypt.hash(password, 12), created_at: now() };
     await db.collection('users').insertOne(user);
-    await db.collection('projects').insertOne({ _id: new ObjectId(), user_id: user._id, name: 'My First Project', description: 'Welcome to your project board!', created_at: now(), columns: defaultColumns(), collaborators: [] });
+    await db.collection('projects').insertOne({ _id: newId(), user_id: user._id, name: 'My First Project', description: 'Welcome to your project board!', created_at: now(), columns: defaultColumns(), collaborators: [] });
     res.status(201).json({ token: token(user), user: userJson(user) });
   } catch (error) { fail(res, error); }
 });
@@ -114,7 +115,7 @@ app.get('/api/projects', auth, async (req, res) => {
 });
 app.post('/api/projects', auth, async (req, res) => {
   const name = String(req.body.name || '').trim(); if (!name) return res.status(400).json({ error: 'Name required' });
-  try { const project = { _id: new ObjectId(), user_id: oid(req.user.sub), name, description: req.body.description || '', created_at: now(), columns: defaultColumns(), collaborators: [] }; await (await getDb()).collection('projects').insertOne(project); res.status(201).json(projectJson(project)); }
+  try { const project = { _id: newId(), user_id: oid(req.user.sub), name, description: req.body.description || '', created_at: now(), columns: defaultColumns(), collaborators: [] }; await (await getDb()).collection('projects').insertOne(project); res.status(201).json(projectJson(project)); }
   catch (error) { fail(res, error); }
 });
 app.get('/api/projects/:id', auth, async (req, res) => {
@@ -141,7 +142,7 @@ app.post('/api/projects/:id/collaborators', auth, async (req, res) => {
 });
 
 app.post('/api/columns', auth, async (req, res) => {
-  try { const project = await getProject(req.body.project_id); if (!project || !roleFor(project, req.user.sub)) return res.status(403).json({ error: 'Forbidden' }); const name = String(req.body.name || '').trim(); if (!name) return res.status(400).json({ error: 'project_id and name required' }); const column = { _id: new ObjectId(), name, position: project.columns?.length || 0, tasks: [] }; await (await getDb()).collection('projects').updateOne({ _id: project._id }, { $push: { columns: column } }); res.status(201).json({ id: String(column._id), project_id: String(project._id), name, position: column.position, tasks: [] }); }
+  try { const project = await getProject(req.body.project_id); if (!project || !roleFor(project, req.user.sub)) return res.status(403).json({ error: 'Forbidden' }); const name = String(req.body.name || '').trim(); if (!name) return res.status(400).json({ error: 'project_id and name required' }); const column = { _id: newId(), name, position: project.columns?.length || 0, tasks: [] }; await (await getDb()).collection('projects').updateOne({ _id: project._id }, { $push: { columns: column } }); res.status(201).json({ id: String(column._id), project_id: String(project._id), name, position: column.position, tasks: [] }); }
   catch (error) { fail(res, error); }
 });
 app.put('/api/columns/:id', auth, async (req, res) => {
@@ -158,7 +159,7 @@ app.get('/api/tasks/:id', auth, async (req, res) => {
   catch (error) { fail(res, error); }
 });
 app.post('/api/tasks', auth, async (req, res) => {
-  try { const project = await projectContainingColumn(req.body.column_id); if (!project || !roleFor(project, req.user.sub)) return res.status(403).json({ error: 'Forbidden' }); const column = findColumn(project, req.body.column_id); const title = String(req.body.title || '').trim(); if (!title) return res.status(400).json({ error: 'column_id and title required' }); const task = { _id: new ObjectId(), title, description: req.body.description || '', priority: req.body.priority || 'medium', start_date: req.body.start_date || null, end_date: req.body.end_date || null, start_time: req.body.start_time || null, end_time: req.body.end_time || null, position: column.tasks?.length || 0, created_at: now() }; await (await getDb()).collection('projects').updateOne({ _id: project._id, 'columns._id': column._id }, { $push: { 'columns.$.tasks': task } }); res.status(201).json(taskJson(task, column._id)); }
+  try { const project = await projectContainingColumn(req.body.column_id); if (!project || !roleFor(project, req.user.sub)) return res.status(403).json({ error: 'Forbidden' }); const column = findColumn(project, req.body.column_id); const title = String(req.body.title || '').trim(); if (!title) return res.status(400).json({ error: 'column_id and title required' }); const task = { _id: newId(), title, description: req.body.description || '', priority: req.body.priority || 'medium', start_date: req.body.start_date || null, end_date: req.body.end_date || null, start_time: req.body.start_time || null, end_time: req.body.end_time || null, position: column.tasks?.length || 0, created_at: now() }; await (await getDb()).collection('projects').updateOne({ _id: project._id, 'columns._id': column._id }, { $push: { 'columns.$.tasks': task } }); res.status(201).json(taskJson(task, column._id)); }
   catch (error) { fail(res, error); }
 });
 app.put('/api/tasks/:id', auth, async (req, res) => {
@@ -188,4 +189,4 @@ app.use(express.static(dist));
 app.get(/.*/, (req, res, next) => req.path.startsWith('/api/') ? next() : res.sendFile(path.join(dist, 'index.html')));
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
 app.use((error, _req, res, _next) => fail(res, error));
-app.listen(PORT, () => console.log(`ProjectManager listening on port ${PORT} with MongoDB`));
+app.listen(PORT, () => console.log(`ProjectManager listening on port ${PORT} with MySQL`));

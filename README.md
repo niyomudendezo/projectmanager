@@ -1,6 +1,6 @@
 # 📋 ProjectManager
 
-A full-stack Kanban-based project management web application built with **React + TypeScript**, **Node.js/Express**, and **MongoDB Atlas**. Inspired by tools like Trello, Asana, and Monday.com.
+A full-stack Kanban-based project management web application built with **React + TypeScript**, **Node.js/Express**, and **Hostinger MySQL**. Inspired by tools like Trello, Asana, and Monday.com.
 
 🔗 **Live Repository:** [https://github.com/niyomudendezo/projectmanager](https://github.com/niyomudendezo/projectmanager)
 
@@ -31,7 +31,7 @@ A full-stack Kanban-based project management web application built with **React 
 | HTTP      | Axios                                   |
 | Routing   | React Router DOM v7                     |
 | Backend   | Node.js 20+, Express                    |
-| Database  | MongoDB Atlas                           |
+| Database  | MySQL / phpMyAdmin                      |
 | Auth      | JWT (JSON Web Tokens)                   |
 | Server    | Hostinger Node.js Web App               |
 
@@ -65,7 +65,7 @@ projectmanager/
 │   │   └── index.css          # Global styles
 │   ├── package.json
 │   └── vite.config.ts
-├── db.js                      # MongoDB connection
+├── db.js                      # MySQL connection
 ├── server.js                  # Express API and static server
 └── README.md
 ```
@@ -77,7 +77,7 @@ projectmanager/
 ### Prerequisites
 
 - Node.js v20+ and npm
-- A MongoDB Atlas deployment or Hostinger MongoDB connection
+- A Hostinger MySQL database and database user
 
 ---
 
@@ -90,12 +90,12 @@ cd projectmanager
 
 ---
 
-### 2. MongoDB Database Setup
+### 2. MySQL Database Setup
 
-1. In the Hostinger Web App dashboard, select **Database → Connect → MongoDB Atlas**.
-2. Complete the Atlas connection flow.
-3. Confirm `MONGODB_URI` is available to the Web App and add `JWT_SECRET`.
-4. See `MONGODB_SETUP.md` for verification and manual configuration.
+1. Create a database and user in Hostinger **Databases → Management**.
+2. Add the `MYSQL_*` credentials to the Web App environment variables.
+3. Add `JWT_SECRET`, apply changes, and redeploy.
+4. See `MYSQL_SETUP.md` for the exact variables.
 
 ---
 
@@ -103,8 +103,10 @@ cd projectmanager
 
 1. Configure the server environment:
    ```env
-   MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/?retryWrites=true&w=majority
-   MONGODB_DATABASE=projectmanager
+   MYSQL_HOST=localhost
+   MYSQL_DATABASE=u344479203_projectmanager
+   MYSQL_USER=u344479203_postgres
+   MYSQL_PASSWORD=your-private-password
    JWT_SECRET=replace-with-a-long-random-secret
    ```
 
