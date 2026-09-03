@@ -5,9 +5,9 @@
   "description": "ProjectManager React application with an Express and Hostinger MySQL backend",
   "main": "server.js",
   "scripts": {
-    "dev": "node --watch server.js",
-    "start": "node server.js",
-    "build": "npm --prefix frontend ci && npm --prefix frontend run build",
+    "dev": "node init && node --watch server.js",
+    "start": "node init && node server.js",
+    "build": "node init && npm --prefix frontend ci && npm --prefix frontend run build",
     "check": "node --check server.js && node --check db.js && npm --prefix frontend run build"
   },
   "engines": {
